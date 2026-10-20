@@ -558,9 +558,13 @@ int hal_isp_set_sinter_strength(void *ctx, int val)
     return IMP_ISP_Tuning_SetSinterStrength((uint32_t)v);
 #elif defined(PLATFORM_T32) || defined(PLATFORM_T33) || defined(PLATFORM_T40) ||                    \
     defined(PLATFORM_T41)
-    /* Gen3: denoise strength lives in the module ratio array (128 = neutral) */
+    /* Gen3: read-modify-write — SetModule_Ratio commits the whole array, so a
+     * zeroed struct would leave every other module DISABLED (header example is
+     * Get->modify->Set for exactly this reason). */
     IMPISPModuleRatioAttr ratio;
-    memset(&ratio, 0, sizeof(ratio));
+    int ret = IMP_ISP_Tuning_GetModule_Ratio(IMPVI_MAIN, &ratio);
+    if (ret != 0)
+        return ret;
     ratio.ratio_attr[IMP_ISP_MODULE_SINTER].en = IMPISP_TUNING_OPS_MODE_ENABLE;
     ratio.ratio_attr[IMP_ISP_MODULE_SINTER].ratio = v;
     return IMP_ISP_Tuning_SetModule_Ratio(IMPVI_MAIN, &ratio);
@@ -592,9 +596,11 @@ int hal_isp_set_temper_strength(void *ctx, int val)
     return IMP_ISP_Tuning_SetTemperStrength((uint32_t)v);
 #elif defined(PLATFORM_T32) || defined(PLATFORM_T33) || defined(PLATFORM_T40) ||                    \
     defined(PLATFORM_T41)
-    /* Gen3: denoise strength lives in the module ratio array (128 = neutral) */
+    /* Gen3: read-modify-write — see hal_isp_set_sinter_strength */
     IMPISPModuleRatioAttr ratio;
-    memset(&ratio, 0, sizeof(ratio));
+    int ret = IMP_ISP_Tuning_GetModule_Ratio(IMPVI_MAIN, &ratio);
+    if (ret != 0)
+        return ret;
     ratio.ratio_attr[IMP_ISP_MODULE_TEMPER].en = IMPISP_TUNING_OPS_MODE_ENABLE;
     ratio.ratio_attr[IMP_ISP_MODULE_TEMPER].ratio = v;
     return IMP_ISP_Tuning_SetModule_Ratio(IMPVI_MAIN, &ratio);
@@ -648,9 +654,11 @@ int hal_isp_set_dpc_strength(void *ctx, int val)
     return IMP_ISP_Tuning_SetDPC_Strength((unsigned int)v);
 #elif defined(PLATFORM_T32) || defined(PLATFORM_T33) || defined(PLATFORM_T40) ||                    \
     defined(PLATFORM_T41)
-    /* Gen3: strength lives in the module ratio array (128 = neutral) */
+    /* Gen3: read-modify-write — see hal_isp_set_sinter_strength */
     IMPISPModuleRatioAttr ratio;
-    memset(&ratio, 0, sizeof(ratio));
+    int ret = IMP_ISP_Tuning_GetModule_Ratio(IMPVI_MAIN, &ratio);
+    if (ret != 0)
+        return ret;
     ratio.ratio_attr[IMP_ISP_MODULE_DPC].en = IMPISP_TUNING_OPS_MODE_ENABLE;
     ratio.ratio_attr[IMP_ISP_MODULE_DPC].ratio = v;
     return IMP_ISP_Tuning_SetModule_Ratio(IMPVI_MAIN, &ratio);
@@ -679,9 +687,11 @@ int hal_isp_set_drc_strength(void *ctx, int val)
     return IMP_ISP_Tuning_SetDRC_Strength((unsigned int)v);
 #elif defined(PLATFORM_T32) || defined(PLATFORM_T33) || defined(PLATFORM_T40) ||                    \
     defined(PLATFORM_T41)
-    /* Gen3: strength lives in the module ratio array (128 = neutral) */
+    /* Gen3: read-modify-write — see hal_isp_set_sinter_strength */
     IMPISPModuleRatioAttr ratio;
-    memset(&ratio, 0, sizeof(ratio));
+    int ret = IMP_ISP_Tuning_GetModule_Ratio(IMPVI_MAIN, &ratio);
+    if (ret != 0)
+        return ret;
     ratio.ratio_attr[IMP_ISP_MODULE_DRC].en = IMPISP_TUNING_OPS_MODE_ENABLE;
     ratio.ratio_attr[IMP_ISP_MODULE_DRC].ratio = v;
     return IMP_ISP_Tuning_SetModule_Ratio(IMPVI_MAIN, &ratio);
@@ -3509,9 +3519,11 @@ int hal_isp_set_sinter_strength_n(void *ctx, int sensor_idx, int val)
     return IMP_ISP_Tuning_SetSinterStrength((uint32_t)v);
 #elif defined(PLATFORM_T32) || defined(PLATFORM_T33) || defined(PLATFORM_T40) ||                   \
     defined(PLATFORM_T41)
-    /* Gen3: denoise strength lives in the module ratio array (128 = neutral) */
+    /* Gen3: read-modify-write — see hal_isp_set_sinter_strength */
     IMPISPModuleRatioAttr ratio;
-    memset(&ratio, 0, sizeof(ratio));
+    int ret = IMP_ISP_Tuning_GetModule_Ratio((IMPVI_NUM)sensor_idx, &ratio);
+    if (ret != 0)
+        return ret;
     ratio.ratio_attr[IMP_ISP_MODULE_SINTER].en = IMPISP_TUNING_OPS_MODE_ENABLE;
     ratio.ratio_attr[IMP_ISP_MODULE_SINTER].ratio = v;
     return IMP_ISP_Tuning_SetModule_Ratio((IMPVI_NUM)sensor_idx, &ratio);
@@ -3536,9 +3548,11 @@ int hal_isp_set_temper_strength_n(void *ctx, int sensor_idx, int val)
     return IMP_ISP_Tuning_SetTemperStrength((uint32_t)v);
 #elif defined(PLATFORM_T32) || defined(PLATFORM_T33) || defined(PLATFORM_T40) ||                   \
     defined(PLATFORM_T41)
-    /* Gen3: denoise strength lives in the module ratio array (128 = neutral) */
+    /* Gen3: read-modify-write — see hal_isp_set_sinter_strength */
     IMPISPModuleRatioAttr ratio;
-    memset(&ratio, 0, sizeof(ratio));
+    int ret = IMP_ISP_Tuning_GetModule_Ratio((IMPVI_NUM)sensor_idx, &ratio);
+    if (ret != 0)
+        return ret;
     ratio.ratio_attr[IMP_ISP_MODULE_TEMPER].en = IMPISP_TUNING_OPS_MODE_ENABLE;
     ratio.ratio_attr[IMP_ISP_MODULE_TEMPER].ratio = v;
     return IMP_ISP_Tuning_SetModule_Ratio((IMPVI_NUM)sensor_idx, &ratio);
